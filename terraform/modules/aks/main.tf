@@ -5,14 +5,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
   resource_group_name = var.resource_group_name
   dns_prefix          = var.dns_prefix
 
-  default_node_pool {
-    name                = "default"
-    node_count          = var.agent_count
-    min_count           = 1
-    max_count           = 3
-    vm_size             = var.agent_vm_size
-    vnet_subnet_id      = var.subnet_id
-  }
+default_node_pool {
+  name                = "default"
+  min_count           = 1
+  max_count           = 3
+  vm_size             = var.agent_vm_size
+  vnet_subnet_id      = var.subnet_id
+  enable_auto_scaling = true
+}
 
   identity {
     type = "SystemAssigned"

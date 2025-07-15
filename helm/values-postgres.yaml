@@ -1,0 +1,8 @@
+auth:
+  username: postgres
+  password: postgrespass
+  database: postgres
+
+primary:
+  persistence:
+    enabled: false

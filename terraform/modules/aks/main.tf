@@ -1,0 +1,39 @@
+# AKS cluster definition
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = var.aks_cluster_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  dns_prefix          = var.dns_prefix
+
+  default_node_pool {
+    name                = "default"
+    node_count          = var.agent_count
+    min_count           = 1
+    max_count           = 3
+    vm_size             = var.agent_vm_size
+    vnet_subnet_id      = var.subnet_id
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  linux_profile {
+    admin_username = "azureuser"
+    ssh_key {
+      key_data = var.ssh_public_key
+    }
+  }
+
+  network_profile {
+    network_plugin     = "azure"
+    load_balancer_sku  = "standard"
+    outbound_type      = "loadBalancer"
+  }
+
+  # rbac_enabled = true
+
+  tags = {
+    Environment = "Dev"
+  }
+}

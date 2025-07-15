@@ -1,0 +1,17 @@
+auth:
+  adminUser: admin
+  adminPassword: adminpass
+
+postgresql:
+  enabled: false
+
+externalDatabase:
+  host: postgres.default.svc.cluster.local
+  user: postgres
+  password: postgrespass
+  database: postgres
+
+proxyAddressForwarding: true
+service:
+  type: LoadBalancer
+

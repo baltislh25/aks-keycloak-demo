@@ -1,4 +1,4 @@
-resource_group_name = "aks-keycloak-tf-rg"
+resource_group_name = "rg-terraform-backend"
 aks_cluster_name    = "keycloak-aks"
 dns_prefix          = "keycloak"
 vnet_name           = "keycloak-vnet"

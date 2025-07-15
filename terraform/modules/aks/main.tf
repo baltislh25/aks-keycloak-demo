@@ -25,8 +25,9 @@ default_node_pool {
 
   network_profile {
     network_plugin     = "azure"
-    load_balancer_sku  = "standard"
-    outbound_type      = "loadBalancer"
+    service_cidr       = "10.200.0.0/16"      # <- far away from 10.0.1.0/24
+    dns_service_ip     = "10.200.0.10"
+    
   }
 
   # rbac_enabled = true

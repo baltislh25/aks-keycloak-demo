@@ -21,10 +21,4 @@ module "aks" {
   ssh_public_key      = module.network.ssh_public_key
   subnet_id           = module.network.subnet_id
 }
-module "acr" {
-  source              = "./modules/container_registry"
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  acr_name           = var.acr_name  # Add this line
-  env                = var.env       # Add this line
-}
+

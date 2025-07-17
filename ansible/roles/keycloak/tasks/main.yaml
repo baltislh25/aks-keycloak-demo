@@ -1,0 +1,56 @@
+- name: Create Keycloak namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ keycloak_namespace }}"
+
+- name: Deploy Keycloak using Helm
+  community.kubernetes.helm:
+    name: keycloak
+    chart_ref: "{{ keycloak_chart }}"
+    release_namespace: "{{ keycloak_namespace }}"
+    values:
+      auth:
+        adminUser: "{{ keycloak_admin_user }}"
+        adminPassword: "{{ keycloak_admin_password }}"
+      postgresql:
+        enabled: false
+      externalDatabase:
+        host: postgres.postgres.svc.cluster.local
+        user: postgres
+        password: "{{ postgres_password }}"
+        database: postgres
+      service:
+        type: LoadBalancer
+
+- name: Copy realm file to pod
+  kubernetes.core.k8s_cp:
+    namespace: keycloak
+    pod: "{{ keycloak_pod_name }}"
+    src: files/realm-export.json
+    dest: /tmp/realm-export.json
+
+- name: Copy setup script to pod
+  kubernetes.core.k8s_cp:
+    namespace: keycloak
+    pod: "{{ keycloak_pod_name }}"
+    src: files/keycloak-configure.sh
+    dest: /tmp/keycloak-configure.sh
+
+- name: Run Keycloak configuration
+  kubernetes.core.k8s_exec:
+    namespace: keycloak
+    pod: "{{ keycloak_pod_name }}"
+    command: "bash /tmp/keycloak-configure.sh"
+
+- name: Get list of Keycloak pods
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: keycloak
+    label_selectors:
+      - app.kubernetes.io/name=keycloak
+  register: keycloak_pods
+
+- name: Set fact with Keycloak pod name
+  set_fact:
+    keycloak_pod_name: "{{ keycloak_pods.resources[0].metadata.name }}"

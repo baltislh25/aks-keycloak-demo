@@ -1,0 +1,12 @@
+- name: Create web namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ web_namespace }}"
+
+- name: Deploy static site
+  kubernetes.core.k8s:
+    definition: "{{ lookup('file', 'static-site.yaml') | from_yaml }}"
+
+- name: Include static website deployment
+  include_tasks: static-site.yaml

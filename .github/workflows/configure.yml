@@ -1,0 +1,32 @@
+name: Configure Keycloak & Static Site
+
+on:
+  workflow_dispatch:
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Configure kubeconfig
+      run: az aks get-credentials --resource-group <your-rg> --name <your-aks-name> --overwrite-existing
+
+    - name: Install kubectl & kcadm
+      run: |
+        sudo snap install kubectl --classic
+        sudo apt-get update && sudo apt-get install -y jq curl unzip
+        curl -L https://github.com/keycloak/keycloak/releases/download/24.0.1/keycloak-24.0.1.zip -o kc.zip
+        unzip kc.zip
+        export PATH=$PATH:$(pwd)/keycloak-24.0.1/bin
+
+    - name: Run configuration script
+      run: |
+        chmod +x ansible/scripts/keycloak-configure.sh
+        ./ansible/scripts/keycloak-configure.sh

@@ -1,0 +1,20 @@
+- name: Create postgres namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: postgres
+
+- name: Deploy PostgreSQL using Helm
+  community.kubernetes.helm:
+    name: postgres
+    chart_ref: bitnami/postgresql
+    release_namespace: postgres
+    values:
+      auth:
+        postgresPassword: "{{ postgres_password }}"
+        username: postgres
+        password: "{{ postgres_password }}"
+        database: postgres
+      primary:
+        persistence:
+          enabled: false

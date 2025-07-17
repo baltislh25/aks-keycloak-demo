@@ -1,0 +1,39 @@
+name: Roll Out AKS + Keycloak + Static Web
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Setup Azure CLI
+      uses: azure/CLI@v1
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform -chdir=terraform init
+
+    - name: Terraform Apply
+      run: terraform -chdir=terraform apply -auto-approve
+
+    - name: Configure kubeconfig
+      run: az aks get-credentials --resource-group <your-rg> --name <your-aks-name> --overwrite-existing
+
+    - name: Install Kubernetes Collection
+      run: ansible-galaxy collection install kubernetes.core
+
+    - name: Apply Ansible Playbook
+      run: ansible-playbook -i ansible/inventory.ini ansible/site.yml

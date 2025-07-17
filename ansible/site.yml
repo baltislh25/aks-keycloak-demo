@@ -1,0 +1,7 @@
+- name: Deploy all components to AKS
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - postgres
+    - keycloak
+    - web

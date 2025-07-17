@@ -1,0 +1,67 @@
+- name: Deploy static site service and deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: static-site
+        namespace: web
+      spec:
+        selector:
+          app: static-site
+        ports:
+          - protocol: TCP
+            port: 80
+            targetPort: 80
+        type: LoadBalancer
+---
+- name: Deploy static site nginx deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: static-site
+        namespace: web
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: static-site
+        template:
+          metadata:
+            labels:
+              app: static-site
+          spec:
+            containers:
+              - name: nginx
+                image: nginx:latest
+                ports:
+                  - containerPort: 80
+                volumeMounts:
+                  - name: html
+                    mountPath: /usr/share/nginx/html
+            volumes:
+              - name: html
+                configMap:
+                  name: static-content
+---
+- name: Create ConfigMap with HTML content
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: static-content
+        namespace: web
+      data:
+        index.html: |
+          <html>
+            <head><title>Welcome</title></head>
+            <body>
+              <h1>Hello from Keycloak-secured Static Site!</h1>
+            </body>
+          </html>

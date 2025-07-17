@@ -1,0 +1,6 @@
+keycloak_namespace: keycloak
+keycloak_chart: bitnami/keycloak
+keycloak_admin_user: admin
+keycloak_admin_password: adminpass
+postgres_password: postgrespass
+web_namespace: web
